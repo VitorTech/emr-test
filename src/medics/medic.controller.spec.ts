@@ -20,6 +20,7 @@ describe('MedicController', () => {
   let mockCertificateRepository: Repository<Certificate>;
   let mockScheduleRepository: Repository<Schedule>;
   let mockHospitalMedicRepository: Repository<HospitalMedic>;
+  let mockHospitalRepository: Repository<Hospital>;
 
   let app: TestingModule = null;
 
@@ -63,6 +64,10 @@ describe('MedicController', () => {
         {
           provide: getRepositoryToken(HospitalMedic),
           useValue: mockHospitalMedicRepository,
+        },
+        {
+          provide: getRepositoryToken(Hospital),
+          useValue: mockHospitalRepository,
         },
       ],
     }).compile();

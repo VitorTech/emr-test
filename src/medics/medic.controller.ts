@@ -7,6 +7,7 @@ import {
   Param,
   ParseUUIDPipe,
   HttpStatus,
+  InternalServerErrorException,
 } from '@nestjs/common';
 
 import { CreateMedicDTO } from './dto/create-medic.dto';
@@ -22,6 +23,7 @@ import { Schedule } from './entities/schedule.entity';
 import { CreateMedicScheduleResponseDTO } from './dto/create-medic-schedule-response.dto';
 import { HospitalMedic } from './entities/hospital-medic.entity';
 import { CreateHospitalMedicDTO } from './dto/create-hospital-medic.dto';
+import { CreateHospitalMedicResponseDTO } from './dto/create-hospital-medic-response.dto';
 
 @Controller('medics')
 @ApiTags('medics')
@@ -34,7 +36,14 @@ export class MedicController {
     type: ListMedicsResponseDTO,
   })
   async listMedics(): Promise<Medic[]> {
-    return await this.medicAppService.listMedics();
+    try {
+      return await this.medicAppService.listMedics();
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'Something went wrong trying to list medics.',
+        e.message,
+      );
+    }
   }
 
   @Post()
@@ -43,7 +52,14 @@ export class MedicController {
     type: CreateMedicResponseDTO,
   })
   async createMedic(@Body() medicDto: CreateMedicDTO): Promise<Medic> {
-    return await this.medicAppService.createMedic(medicDto);
+    try {
+      return await this.medicAppService.createMedic(medicDto);
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'Something went wrong trying to create a medic.',
+        e.message,
+      );
+    }
   }
 
   @Post(':medicId/certificate')
@@ -61,10 +77,17 @@ export class MedicController {
     medicId: string,
     @Body() createMedicCertificateDto: CreateMedicCertificateDTO,
   ): Promise<Certificate> {
-    return await this.medicAppService.createMedicCertificate(
-      medicId,
-      createMedicCertificateDto,
-    );
+    try {
+      return await this.medicAppService.createMedicCertificate(
+        medicId,
+        createMedicCertificateDto,
+      );
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'Something went wrong trying to create a medic certificate.',
+        e.message,
+      );
+    }
   }
 
   @Post(':medicId/schedule')
@@ -82,18 +105,36 @@ export class MedicController {
     medicId: string,
     @Body() createMedicScheduleDto: CreateMedicScheduleDTO,
   ): Promise<Schedule> {
-    return this.medicAppService.createMedicSchedule(
-      medicId,
-      createMedicScheduleDto,
-    );
+    try {
+      return this.medicAppService.createMedicSchedule(
+        medicId,
+        createMedicScheduleDto,
+      );
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'Something went wrong trying to create a medic schedule.',
+        e.message,
+      );
+    }
   }
 
   @Post('hospital-medic')
+  @ApiResponse({
+    description: 'Creates a new hospital medic relation.',
+    type: CreateHospitalMedicResponseDTO,
+  })
   async createHospitalMedic(
     @Body() createMedicHospitalsDto: CreateHospitalMedicDTO,
   ): Promise<HospitalMedic> {
-    return await this.medicAppService.createHospitalMedic(
-      createMedicHospitalsDto,
-    );
+    try {
+      return await this.medicAppService.createHospitalMedic(
+        createMedicHospitalsDto,
+      );
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'Something went wrong trying to create a hospital-medic.',
+        e.message,
+      );
+    }
   }
 }
