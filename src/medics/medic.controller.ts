@@ -1,5 +1,13 @@
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Body, Controller, Get, Post, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Param,
+  ParseUUIDPipe,
+  HttpStatus,
+} from '@nestjs/common';
 
 import { CreateMedicDTO } from './dto/create-medic.dto';
 import { ListMedicsResponseDTO } from './dto/list-medics-response.dto';
@@ -12,6 +20,8 @@ import { Certificate } from './entities/certificate.entity';
 import { CreateMedicScheduleDTO } from './dto/create-medic-schedule.dto';
 import { Schedule } from './entities/schedule.entity';
 import { CreateMedicScheduleResponseDTO } from './dto/create-medic-schedule-response.dto';
+import { HospitalMedic } from './entities/hospital-medic.entity';
+import { CreateHospitalMedicDTO } from './dto/create-hospital-medic.dto';
 
 @Controller('medics')
 @ApiTags('medics')
@@ -42,7 +52,13 @@ export class MedicController {
     type: CreateMedicCertificateResponseDTO,
   })
   async createMedicCertificate(
-    @Param('medicId') medicId: string,
+    @Param(
+      'medicId',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+      }),
+    )
+    medicId: string,
     @Body() createMedicCertificateDto: CreateMedicCertificateDTO,
   ): Promise<Certificate> {
     return await this.medicAppService.createMedicCertificate(
@@ -57,12 +73,27 @@ export class MedicController {
     type: CreateMedicScheduleResponseDTO,
   })
   async createMedicSchedule(
-    @Param('medicId') medicId: string,
+    @Param(
+      'medicId',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+      }),
+    )
+    medicId: string,
     @Body() createMedicScheduleDto: CreateMedicScheduleDTO,
   ): Promise<Schedule> {
     return this.medicAppService.createMedicSchedule(
       medicId,
       createMedicScheduleDto,
+    );
+  }
+
+  @Post('hospital-medic')
+  async createHospitalMedic(
+    @Body() createMedicHospitalsDto: CreateHospitalMedicDTO,
+  ): Promise<HospitalMedic> {
+    return await this.medicAppService.createHospitalMedic(
+      createMedicHospitalsDto,
     );
   }
 }

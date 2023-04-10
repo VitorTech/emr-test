@@ -8,6 +8,9 @@ import { CreateMedicCertificateDTO } from './dto/create-medic-certificate.dto';
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { CreateMedicScheduleDTO } from './dto/create-medic-schedule.dto';
 import { Schedule } from './entities/schedule.entity';
+import { Hospital } from './entities/hospital.entity';
+import { HospitalMedic } from './entities/hospital-medic.entity';
+import { CreateHospitalMedicDTO } from './dto/create-hospital-medic.dto';
 
 @Injectable()
 export class MedicDomainService {
@@ -18,6 +21,10 @@ export class MedicDomainService {
     private certificateRepository: Repository<Certificate>,
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
+    @InjectRepository(HospitalMedic)
+    private hospitalMedicRepository: Repository<HospitalMedic>,
+    @InjectRepository(Hospital)
+    private hospitalRepository: Repository<Hospital>,
   ) {}
 
   async listMedics(): Promise<Medic[]> {
@@ -84,5 +91,32 @@ export class MedicDomainService {
     });
 
     return await this.scheduleRepository.save(newSchedule);
+  }
+
+  async createHospitalMedic(
+    createHospitalMedicDto: CreateHospitalMedicDTO,
+  ): Promise<HospitalMedic> {
+    const medicExists = await this.medicRepository.findOne({
+      where: { id: createHospitalMedicDto.medicId },
+    });
+
+    if (!medicExists) {
+      throw new NotFoundException('Medic not found.');
+    }
+
+    const hospitalExists = await this.hospitalRepository.findOne({
+      where: { id: createHospitalMedicDto.hospitalId },
+    });
+
+    if (!hospitalExists) {
+      throw new NotFoundException('Hospital not found.');
+    }
+
+    const newHospitalMedic = this.hospitalMedicRepository.create({
+      medicId: createHospitalMedicDto.medicId,
+      hospitalId: createHospitalMedicDto.hospitalId,
+    });
+
+    return await this.hospitalMedicRepository.save(newHospitalMedic);
   }
 }
