@@ -16,6 +16,7 @@ describe('MedicController', () => {
   let medicController: MedicController;
   let mockMedicRepository: Repository<Medic>;
   let mockCertificateRepository: Repository<Certificate>;
+  let mockScheduleRepository: Repository<Schedule>;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -49,6 +50,10 @@ describe('MedicController', () => {
         {
           provide: getRepositoryToken(Certificate),
           useValue: mockCertificateRepository,
+        },
+        {
+          provide: getRepositoryToken(Schedule),
+          useValue: mockScheduleRepository,
         },
       ],
     }).compile();
@@ -92,6 +97,20 @@ describe('MedicController', () => {
       );
 
       expect(response.registerNumber).toBe(certificateData.registerNumber);
+    });
+  });
+
+  describe('createMedicSchedule', () => {
+    it('should create a medic schedule by UUID', async () => {
+      const scheduleData = {
+        date: new Date('2023-05-07'),
+      };
+      const response = await medicController.createMedicSchedule(
+        'ea4d5b9b-77ae-488a-a38c-7c39e41779ed',
+        scheduleData,
+      );
+
+      expect(response.date).toBe(scheduleData.date);
     });
   });
 });

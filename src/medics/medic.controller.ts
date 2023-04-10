@@ -9,6 +9,9 @@ import { CreateMedicCertificateDTO } from './dto/create-medic-certificate.dto';
 import { CreateMedicCertificateResponseDTO } from './dto/create-medic-certificate-response.dto';
 import { CreateMedicResponseDTO } from './dto/create-medic-response.dto';
 import { Certificate } from './entities/certificate.entity';
+import { CreateMedicScheduleDTO } from './dto/create-medic-schedule.dto';
+import { Schedule } from './entities/schedule.entity';
+import { CreateMedicScheduleResponseDTO } from './dto/create-medic-schedule-response.dto';
 
 @Controller('medics')
 @ApiTags('medics')
@@ -45,6 +48,21 @@ export class MedicController {
     return await this.medicAppService.createMedicCertificate(
       medicId,
       createMedicCertificateDto,
+    );
+  }
+
+  @Post(':medicId/schedule')
+  @ApiResponse({
+    description: 'Create medic schedule.',
+    type: CreateMedicScheduleResponseDTO,
+  })
+  async createMedicSchedule(
+    @Param('medicId') medicId: string,
+    @Body() createMedicScheduleDto: CreateMedicScheduleDTO,
+  ): Promise<Schedule> {
+    return this.medicAppService.createMedicSchedule(
+      medicId,
+      createMedicScheduleDto,
     );
   }
 }

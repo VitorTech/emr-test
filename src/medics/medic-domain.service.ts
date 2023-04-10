@@ -6,6 +6,8 @@ import { Certificate } from './entities/certificate.entity';
 import { Medic } from './entities/medic.entity';
 import { CreateMedicCertificateDTO } from './dto/create-medic-certificate.dto';
 import { NotFoundException } from '@nestjs/common/exceptions';
+import { CreateMedicScheduleDTO } from './dto/create-medic-schedule.dto';
+import { Schedule } from './entities/schedule.entity';
 
 @Injectable()
 export class MedicDomainService {
@@ -14,6 +16,8 @@ export class MedicDomainService {
     private medicRepository: Repository<Medic>,
     @InjectRepository(Certificate)
     private certificateRepository: Repository<Certificate>,
+    @InjectRepository(Schedule)
+    private scheduleRepository: Repository<Schedule>,
   ) {}
 
   async listMedics(): Promise<Medic[]> {
@@ -60,5 +64,25 @@ export class MedicDomainService {
     });
 
     return await this.certificateRepository.save(newCertificate);
+  }
+
+  async createMedicSchedule(
+    medicId: string,
+    createMedicScheduleDto: CreateMedicScheduleDTO,
+  ): Promise<Schedule> {
+    const medicExists = await this.medicRepository.findOne({
+      where: { id: medicId },
+    });
+
+    if (!medicExists) {
+      throw new NotFoundException('Medic not found.');
+    }
+
+    const newSchedule = this.scheduleRepository.create({
+      date: createMedicScheduleDto.date,
+      medic: medicExists,
+    });
+
+    return await this.scheduleRepository.save(newSchedule);
   }
 }
