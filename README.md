@@ -27,3 +27,7 @@ $ npm run start:dev
 # unit tests
 $ npm run test
 ```
+
+## Swagger
+
+You can access a list of the available endpoints on http://localhost:3000/api#/ 
