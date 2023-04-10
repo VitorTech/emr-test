@@ -39,7 +39,7 @@ describe('MedicController', () => {
             database: configService.get('DB_NAME'),
             entities: [Medic, Certificate, Schedule, Hospital, HospitalMedic],
             autoLoadEntities: true,
-            synchronize: true,
+            synchronize: false,
           }),
           inject: [ConfigService],
         }),
